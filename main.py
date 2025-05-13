@@ -33,6 +33,21 @@ img = cv2.imread("data/lesson1/cameraman.png", # шлях до файлу
 # uint8 -- ціле число в діапазоні 0 до 255
 
 # виведення
+# cv2.imshow("test img",  # назва зображення
+#            img)
+
+# індексаці
+segment = img[50:200]  # рядки з 50 по 200
+
+print(segment)
+print(segment.dtype)
+print(segment.shape)
+
+#cv2.imshow('segment', segment)
+
+# збільшити всі пікселі у segment на 20
+segment += 20
+
 cv2.imshow("test img",  # назва зображення
            img)
 
