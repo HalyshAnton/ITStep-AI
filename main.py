@@ -26,30 +26,51 @@ img = cv2.imread("data/lesson1/cameraman.png", # шлях до файлу
                  cv2.IMREAD_GRAYSCALE          # зображення чорнобіле
                  )
 
-# print(img)
-# print(img.dtype)
-# print(img.shape)
-
-# uint8 -- ціле число в діапазоні 0 до 255
-
-# виведення
+# # print(img)
+# # print(img.dtype)
+# # print(img.shape)
+#
+# # uint8 -- ціле число в діапазоні 0 до 255
+#
+# # виведення
+# # cv2.imshow("test img",  # назва зображення
+# #            img)
+#
+# # індексаці
+# segment = img[50:200]  # рядки з 50 по 200
+#
+# print(segment)
+# print(segment.dtype)
+# print(segment.shape)
+#
+# #cv2.imshow('segment', segment)
+#
+# # збільшити всі пікселі у segment на 20
+# segment += 20
+#
 # cv2.imshow("test img",  # назва зображення
 #            img)
+#
+# # головний цикл
+# cv2.waitKey(0)
 
-# індексаці
-segment = img[50:200]  # рядки з 50 по 200
 
-print(segment)
-print(segment.dtype)
-print(segment.shape)
+# умови з масивами
+# маска для пікселів які більше 128
+mask = img > 128
 
-#cv2.imshow('segment', segment)
+print(mask.shape)
+print(mask.dtype)
 
-# збільшити всі пікселі у segment на 20
-segment += 20
+# дісати пікселі, які відповідають масці
 
-cv2.imshow("test img",  # назва зображення
-           img)
+# print(img[mask])
 
-# головний цикл
+img[mask] = 255  # всі пікселі що відповідають масці
+img[~mask] = 0   # всі пікселі що не відповідають масці
+
+cv2.imshow('', img)
 cv2.waitKey(0)
+
+
+
