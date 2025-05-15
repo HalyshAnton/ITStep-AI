@@ -65,24 +65,48 @@ img_hsv = cv2.cvtColor(img_bgr,
 # cv2.waitKey(0)
 
 
-# підбір параметрів
-import utils
+# # підбір параметрів
+# import utils
+#
+#
+# @utils.trackbar_decorator(min_h=(0, 180), min_s=(0, 255), min_v=(0, 255),
+#                           max_h=(0, 180), max_s=(0, 255), max_v=(0, 255))
+# def func(img, min_h, min_s, min_v, max_h, max_s, max_v):
+#     lower = (min_h, min_s, min_v)
+#     upper = (max_h, max_s, max_v)
+#
+#     # конвертацію в hsv
+#     hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+#
+#     # маска
+#     mask = cv2.inRange(hsv, lower, upper)
+#
+#     return mask
+#
+#
+# img = cv2.imread("data/lesson2/lego.jpg")
+# func(img)
 
+# img = cv2.imread("data/lesson2/bio_low_contrast.jpg", cv2.IMREAD_GRAYSCALE)
+#
+# cv2.imshow("original", img)
+#
+# # вирівнювання гістограм
+# new_img = cv2.equalizeHist(img)
+#
+# cv2.imshow("eqhist", new_img)
 
-@utils.trackbar_decorator(min_h=(0, 180), min_s=(0, 255), min_v=(0, 255),
-                          max_h=(0, 180), max_s=(0, 255), max_v=(0, 255))
-def func(img, min_h, min_s, min_v, max_h, max_s, max_v):
-    lower = (min_h, min_s, min_v)
-    upper = (max_h, max_s, max_v)
+# з кольоровим
+img = cv2.imread("data/lesson2/cell.png")
 
-    # конвертацію в hsv
-    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+lab = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
+# канал l(luminance) -- яскравість
 
-    # маска
-    mask = cv2.inRange(hsv, lower, upper)
+lab[:, :, 0] = cv2.equalizeHist(lab[:, :, 0])
 
-    return mask
+new_img = cv2.cvtColor(lab, cv2.COLOR_LAB2BGR)
 
+cv2.imshow("original", img)
+cv2.imshow("eq", new_img)
 
-img = cv2.imread("data/lesson2/lego.jpg")
-func(img)
+cv2.waitKey(0)
