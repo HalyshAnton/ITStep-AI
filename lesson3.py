@@ -59,10 +59,10 @@ img = cv2.imread("data/lesson3/castello_noised.png")
 # cv2.imshow("original", img)
 # cv2.waitKey(0)
 
-
+cv2.ADAPTIVE_THRESH_GAUSSIAN_C
 # бінарізація(звичайна)
 
-img = cv2.imread("data/lesson3/sudoku.jpg")
+img = cv2.imread("data/lesson3/darken_page.jpg")
 
 # перевести в чорнобілий формат
 gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
