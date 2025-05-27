@@ -19,9 +19,8 @@ import cv2
 # показ відое покадрово
 
 cap = cv2.VideoCapture("data/lesson7/cars.mp4")
-#cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(0)
 
-print(cap.read())
 
 # fps відео
 fps = cap.get(cv2.CAP_PROP_FPS)
@@ -37,14 +36,14 @@ width = int(width)
 height = int(height)
 
 # кодек
-fourcc = cv2.VideoWriter_fourcc(*'XVID')
+fourcc = cv2.VideoWriter_fourcc(*'mp4v')
 
 writer = cv2.VideoWriter(
-    "new_video.avi",  # назва файлу
+    "new_video.mp4",  # назва файлу
     fourcc,   #  кодек
     fps,      # частота кадрів
     (width, height),   # розмір кадру
-    isColor=True  # чи кольорове зображення
+    isColor=False  # чи кольорове зображення
 )
 
 
