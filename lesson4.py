@@ -78,4 +78,3 @@ cv2.imshow("eroded", eroded)
 cv2.imshow("dilate", dilated)
 cv2.imshow("both", both)
 cv2.waitKey(0)
-
