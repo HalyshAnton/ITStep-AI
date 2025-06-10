@@ -1,59 +1,60 @@
-from langchain_huggingface import HuggingFaceEndpoint
-import os
+from langchain_google_genai import GoogleGenerativeAI
+
 import dotenv
+import os
 
-
+# завантажити api ключі з папки .env
 dotenv.load_dotenv()
-api_key = os.getenv('HUGGINGFACEHUB_API_TOKEN')
-repo_id = "mistralai/Mistral-7B-Instruct-v0.3"
 
+# отримати сам ключ
+api_key = os.getenv('GEMINI_API_KEY')
 
-llm = HuggingFaceEndpoint(
-    repo_id=repo_id,  # ID моделі на Hugging Face (наприклад, "mistralai/Mistral-7B-Instruct-v0.1")
-    temperature=0.1,  # Впливає на випадковість генерації (нижчі значення → більш передбачувані відповіді)
-    max_new_tokens=50,  # Максимальна кількість нових токенів, які модель може згенерувати
-    top_p=0.8,  # Nucleus sampling: модель вибирає токени, сукупна ймовірність яких становить 80%
-    top_k=10,  # Модель розглядає лише 10 найімовірніших токенів на кожному кроці
-    model_kwargs={
-        'frequency_penalty': 1.2,  # Штраф за повторюваність слів (вищі значення → менше повторень)
-        'presence_penalty': 0.5,  # Стимулює введення нових слів у відповідь (вищі значення → більша різноманітність)
-    }
+# створення моделі
+# Велика мовна модель(llm)
+
+# llm = GoogleGenerativeAI(
+#     model='gemini-2.0-flash',  # назва моделі
+#     google_api_key=api_key,    # ваша API
+# )
+#
+# # запуск моделі
+# response = llm.invoke("Привіт, що таке LLM?")
+# print(response)
+
+# як воно працює?
+# текст(запит) ділиться на токен(слова але не тільки)
+# для прикладу вище токени такі
+# <START> Привіт , що таке LLM ? <END>
+
+# модель отримує запит і шматок готової відповіді
+
+# Запит: <START> Привіт , що таке LLM ? <END>
+# Відповідь: <START> Привіт LLM це
+
+# Для кожного слова отримуємо ймовірність
+# що це слово має бути наступним
+# модель -- 20%
+# велика -- 18%
+# технологія -- 10%
+# яблуко -- 0,000000001%
+
+# параметри моделі
+
+llm = GoogleGenerativeAI(
+    model='gemini-2.0-flash',  # назва моделі
+    google_api_key=api_key,    # ваша API
+    #top_k=10,                  # серед скількох найбільш ймовірних слів обирати нове слово
+    temperature=1.7,            # температура
+    max_output_tokens=20        # максимальна довжина відповіді у токенах
 )
 
-# model = prompt | llm
-#
-# text = model.invoke({'animal': 'програміст'})
-# print(text)
-#
-#
-# # response = llm.invoke("Придумай коротку історію про кота(4 речення)")
-# # response = response.replace('. ', '.\n')
-# # print(response)
-#
-# print(llm.invoke("[INST]Craft a Python function to convert Celsius to Fahrenheit. If water boils at 100°C, what's that in Fahrenheit?[/INST]"))
+# температура відповідає за креативність відповіді
+# 0 - 0,3 -- мала креативність(відповіді чіткі та ясні)
+# 0,4 - 1,2 -- середня креативність(відповіді інформативні, модель дає більш живі відподі)
+# 1,5 - 2,0 -- велика креативність(підходить для генерації текстів, створення історій)
+# 2.0 >   -- галюцинації
 
 
-with open('data/lesson9/rules.txt', encoding='utf-8') as f:
-    text = f.read()
-
-
-
-prompt = f"""
-[INST]Ти асисент по допомозі клієнтам атракціону. Твоє завдання давати відповіді на питання базуючись на документі.[/INST]
-
-<s>Документ: {text}</s>
-
-<s>Питання: З якого віку можна користуватись атракціоном?</s>
-"""
-
-# prompt = f"""
-# Ти асисент по допомозі клієнтам атракціону. Твоє завдання давати відповіді на питання базуючись на документі. Відповіді мають бути короткими.
-#
-# Документ: {text}
-#
-# Питання: З якого віку можна користуватись атракціоном?
-# Дай відповідь одним реченням
-# """
-
-#print(llm.invoke("[INST]Яка столиця Франції? Відповідь в одне слово[/INST]"))
-print(llm.invoke("Яка столиця Франції?"))
+# запуск моделі
+response = llm.invoke("Привіт, що таке LLM?")
+print(response)
