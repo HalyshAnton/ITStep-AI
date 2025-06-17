@@ -1,110 +1,154 @@
-from langchain_huggingface import HuggingFaceEndpoint, ChatHuggingFace
-from langchain.prompts import ChatPromptTemplate, PromptTemplate
+from langchain_google_genai import GoogleGenerativeAI
+from langchain.prompts import PromptTemplate
 from langchain.output_parsers import ResponseSchema, StructuredOutputParser
-from langchain_core.output_parsers import StrOutputParser
+
+import json
 import dotenv
+import os
 
-
+# завантажити api ключі з папки .env
 dotenv.load_dotenv()
-repo_id = "mistralai/Mistral-7B-Instruct-v0.3"
 
-llm = HuggingFaceEndpoint(
-    repo_id=repo_id,
-    temperature=0.7,
-    max_new_tokens=200,
-    #frequency_penalty=1.2,
+# отримати сам ключ
+api_key = os.getenv('GEMINI_API_KEY')
+
+# створення моделі
+# Велика мовна модель(llm)
+
+llm = GoogleGenerativeAI(
+    model='gemini-2.0-flash',  # назва моделі
+    google_api_key=api_key,    # ваша API
 )
 
-# 2. Ланцюг для визначення теми питання
-response_schema = [
-    ResponseSchema(name='question', description='Питання задане користувачем'),
-    ResponseSchema(name='topic', description="Категорія до якої належить питання")
+# Користувач задає питання по книзі
+# Ваша задача:
+# 1. Дати відповідь на питання
+# 2. Порекомендувати схожі книги(на ту саму тему, того ж автора, жанру, ...)
+
+# має назву книги і питання -- хочемо отримати всю інформацію про книгу
+# і відповідь на питання
+
+# маючи інформацію про книгу порекомендувати щось схоже
+
+
+# ------------------------------
+
+# схема для відповідей
+schemas = [
+    ResponseSchema(name='answer', description='відповідь на питання користувача'),
+    ResponseSchema(name='theme', description='головна тема книги'),
+    ResponseSchema(name='author', description='автор книги'),
+    ResponseSchema(name='jaunre', description='жанр книги')
 ]
 
-parser = StructuredOutputParser.from_response_schemas(response_schema)
-format_instructions = parser.get_format_instructions()
+# створення парсер
+parser = StructuredOutputParser.from_response_schemas(schemas)
 
-topic_prompt = PromptTemplate.from_template(
-    template="Визнач, до якої категорії належить це питання: '{question}'. "
-    "Вибери одну з: Наука, Історія, Технології."
-    "Відповідай у наступному форматі:\n{format_instructions}",
-    partial_variables={"format_instructions": format_instructions}
+# отримати інструкція для llm
+instructions = parser.get_format_instructions()
+
+#print(instructions)
+
+# створення промпта
+prompt = PromptTemplate.from_template(
+    """
+    Ти асистент онлайн книгарні. Твоя задача давати відповіді
+    на питання користувачів. Відповіді мають бути чіткі та інформативні.
+    Загальний стиль спілкування ввічливий, іноді можеш використовувати
+    неформальний стиль.
+    Також ти повинен визначити параметри книжки про яку питає
+    користувач(наприклад жанр, автор, тема, ...)
+    
+    Питання: {question}
+    
+    Формат відповіді:
+    {instructions}
+    """,
+    partial_variables={"instructions": instructions}
 )
 
-topic_chain = topic_prompt | llm | parser
+# створення ланцюга
+chain = prompt | llm | parser
+
+response = chain.invoke({
+    "question": "Коли була написана книга 1984",
+})
+
+print(response)
+print(response['theme'])
+print(type(response))
+
+# # збереження у файл
+# with open('response.json', 'w', encoding='UTF-8') as file:
+#     json.dump(response, file)
+#
+# # завантаження з файлу
+# with open('response.json', 'r', encoding='UTF-8') as file:
+#     new_response = json.load(file)
+#
+# print(new_response)
 
 
-answer_prompt = PromptTemplate.from_template(
-    "Дай коротку відповідь на питання: {question}\n"
-    "Порекомендуй інші цікаві теми з {topic} які пов'язані з питанням {question}. Наведи список з 3-5 речей, лише назви"
+# рекомендація схожих книг
+prompt = PromptTemplate.from_template(
+    """
+    Ти асистент онлайн книгарні. Твоя задача давати рекомендації книг
+    користувачам певно жанру, теми та автора. Запропонуй по 3-5 книг по
+    кожному пункту.
+    Загальний стиль спілкування ввічливий, іноді можеш використовувати
+    неформальний стиль.
+    
+    Жанр: {jaunre}
+    Автор: {author}
+    Тема: {theme}
+    
+    Відповідь дай у вигляді списку, познач які книги до якого 
+    пункту відносяться
+    * Книги на схожу тему
+    * Книги того ж автора
+    * Книги того ж жанру
+    """
 )
 
-answer_chain = answer_prompt | llm | StrOutputParser()
+chain_recommendation = prompt | llm
 
-chain = topic_chain | answer_chain
+recommendation = chain_recommendation.invoke({
+    "jaunre": response['jaunre'],
+    "author": response['author'],
+    "theme": response['theme'],
+})
 
-print(chain.invoke({"question": "Коли була висадка на місяць?"}))
+# print(recommendation)
 
+# дістати всі назви книг з рекомендації
 
+schemas = [
+    ResponseSchema(name='books', description='список з назвами книг')
+]
 
-# -----------------------------------
-# schemas = [
-#     ResponseSchema(name="topic", description="Категорія питання (Наука, Історія, Технології)"),
-#     ResponseSchema(name="short_answer", description="Коротка відповідь на питання"),
-#     ResponseSchema(name="long_answer", description="Розгорнута відповідь на питання"),
-# ]
-#
-# # 🔹 Ініціалізуємо StructuredOutputParser
-# output_parser = StructuredOutputParser.from_response_schemas(schemas)
-# format_instructions = output_parser.get_format_instructions()
-#
-# # 🔹 Створюємо промпт із форматуванням
-# prompt = PromptTemplate(
-#     template="Відповідай у наступному форматі:\n{format_instructions}\n\nПитання: {question}",
-#     input_variables=["question"],
-#     partial_variables={"format_instructions": format_instructions},
-# )
-#
-# # 🔹 Ланцюг для отримання структурованих даних
-# chain = prompt | llm | output_parser
-#
-# # 🔹 Тестуємо
-# question = "Що таке квантова механіка?"
-# result = chain.invoke({"question": question})
-#
-# # 🔹 Виводимо результат
-# print(result)
+parser = StructuredOutputParser.from_response_schemas(schemas)
+instructions = parser.get_format_instructions()
 
-# skills_schema = [
-#     ResponseSchema(name="job_description", description="Опис вакансії"),
-#     ResponseSchema(name="skills", description="Ключові навички, необхідні для вакансії")
-# ]
-#
-# skills_parser = StructuredOutputParser.from_response_schemas(skills_schema)
-# format_instructions = skills_parser.get_format_instructions()
-#
-# skills_prompt = PromptTemplate.from_template(
-#     "Витягни ключові навички з вакансії: '{job_description}'.\n"
-#     "Відповідай у наступному форматі:\n{format_instructions}",
-#     partial_variables={"format_instructions": format_instructions}
-# )
-#
-# skills_chain = skills_prompt | llm | skills_parser
-#
-# # 🔹 Генерація резюме
-# resume_prompt = PromptTemplate.from_template(
-#     "Склади резюме для кандидата з такими навичками: {skills}.\n"
-#     "Опис кандидата: {candidate_description}."
-# )
-#
-# resume_chain = resume_prompt | llm | StrOutputParser()
-#
-# # 🔹 Об'єднаний ланцюг
-# resume_generation_chain = skills_chain | resume_chain
-#
-# # 🔹 Тест
-# result = resume_generation_chain.invoke({
-#     "job_description": "Python-розробник, знання Flask, SQL, Docker.",
-#     "candidate_description": "3 роки досвіду в бекенді, розробка REST API."
-# })
-# print(result)
+prompt = PromptTemplate.from_template(
+    """
+    Твоя задача дістати назви усіх книг з тексту.
+    
+    Текст: {text}
+    
+    Формат відповіді:
+    {instructions}
+    """,
+    partial_variables={"instructions": instructions}
+)
+
+chain_book_selector = prompt | llm | parser
+
+response = chain_book_selector.invoke({
+    "text": recommendation
+})
+
+print(response)
+
+for book in response['books']:
+    print(book)
+
