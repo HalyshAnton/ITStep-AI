@@ -1,116 +1,180 @@
-from langchain_huggingface import HuggingFaceEndpoint, ChatHuggingFace
-from langchain.agents import initialize_agent, Tool, AgentType
-from langchain_community.tools.google_search import GoogleSearchRun
-import dotenv
-
-
-#search = GoogleSearchRun()
-#tools = [Tool(name="Search", func=search.run, description="Шукає інформацію в Google")]
-
-
-dotenv.load_dotenv()
-repo_id = "mistralai/Mistral-7B-Instruct-v0.3"
-
-llm = HuggingFaceEndpoint(
-    repo_id=repo_id,
-    temperature=0.7,
-    max_new_tokens=200,
-    #frequency_penalty=1.2,
+from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain.prompts import PromptTemplate
+from langchain_core.messages import (
+    HumanMessage,
+    AIMessage,
+    SystemMessage,
+    trim_messages
 )
 
 
-# agent = initialize_agent(
-#     tools=tools,
-#     llm=llm,
-#     agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,  # або інший тип агента
-#     verbose=True
-# )
+import json
+import dotenv
+import os
 
+# завантажити api ключі з папки .env
+dotenv.load_dotenv()
 
-#response = agent.invoke("Яка столиця Франції?")
-#print(response)
+# отримати сам ключ
+api_key = os.getenv('GEMINI_API_KEY')
 
-from langchain_community.tools import DuckDuckGoSearchRun
+# створення чат моделі
+# Велика мовна модель(llm)
 
-search = DuckDuckGoSearchRun()
+llm = ChatGoogleGenerativeAI(
+    model='gemini-2.0-flash',  # назва моделі
+    google_api_key=api_key,    # ваша API
+)
 
-# agent = initialize_agent(
-#     tools=[search],
-#     llm=llm,
-#     agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION,  # або інший тип агента
-#     #verbose=True
-# )
-
-# response = agent.invoke("Whose is Crimea?")
+# response = llm.invoke("Привіт")
 #
+# print(type(response))
 # print(response)
-# print(llm.invoke(f'[INST]Переклади на українську: {response}[/INST]'))
-#
-
-from langchain.tools import Tool
-from langchain_core.tools import tool
-from langchain.agents import initialize_agent
-import re
-
-# @tool
-# def check_password_strength(password: str) -> str:
-#     """
-#     Check password strength
-#     :param password: user password
-#     :return: response with detailed description
-#     """
-#     issues = []
-#
-#     if len(password) < 8:
-#         issues.append("❌ Пароль занадто короткий (менше 8 символів).")
-#     else:
-#         issues.append("✅ Довжина пароля достатня.")
-#
-#     if not any(c.islower() for c in password) or not any(c.isupper() for c in password):
-#         issues.append("❌ Пароль повинен містити літери у різних регістрах.")
-#     else:
-#         issues.append("✅ Є літери у верхньому та нижньому регістрах.")
-#
-#     if not any(c.isdigit() for c in password):
-#         issues.append("❌ Пароль повинен містити хоча б одну цифру.")
-#     else:
-#         issues.append("✅ Є цифри.")
-#
-#     if not re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
-#         issues.append("❌ Пароль повинен містити хоча б один спеціальний символ.")
-#     else:
-#         issues.append("✅ Є спеціальні символи.")
-#
-#     return "\n".join(issues)
-#
-#
-# # Створення інструменту для агента
-# password_tool = Tool(
-#     name="Password Strength Checker",
-#     func=check_password_strength,
-#     description="Перевіряє складність паролю за кількома критеріями"
-# )
-#
-# # Створення агента
-# agent = initialize_agent(
-#     tools=[check_password_strength],
-#     llm=llm,
-#     agent="zero-shot-react-description",
-#     verbose=False
-# )
-#
-# # Тест агента
-# response = agent.run("[INST]Перевір пароль: MySecurePss[/INST]")
-# print(response)
+# print(repr(response))
 
 
-from langchain_huggingface import HuggingFaceEndpoint, ChatHuggingFace
+# # історія спілкування(чат)
+# messages = [
+#     SystemMessage("""
+#     Ти ввічливий чат бот. Твоя заача давати відповіді на питання
+#     користувача.
+#
+#     Закінчуй усі відповіді фразою "Чи залишились іще питання?"
+#     """),
+#     HumanMessage('Привіт'),
+#     AIMessage('Привіт, чим можу допомогти? Чи залишились іще питання?'),
+#     HumanMessage('Яка столиця Франції?'),
+#     AIMessage('Париж. Чи залишились іще питання?'),
+#     HumanMessage("Розкажи пару фактів про це місто")
+# ]
+#
+# response = llm.invoke(messages)
+#
+# print(response.content)
 
-chat = ChatHuggingFace(llm=llm)
+# простий чат бот
+
+# messages = [
+#     SystemMessage("""
+#     Ти ввічливий чат бот. Твоя заача давати відповіді на питання
+#     користувача.
+#
+#     Закінчуй усі відповіді фразою "Чи залишились іще питання?"
+#     """)
+# ]
+#
+# # основний цикл
+# while True:
+#     # отримати повідомлення від користувача
+#     user_text = input('Ви: ')
+#
+#     # умова зупинки
+#     if user_text == '':
+#         break
+#
+#     # змінити тип даних на HumanMessage
+#     human_message = HumanMessage(user_text)
+#
+#     # змінити історію
+#     messages.append(human_message)
+#
+#     # застосувати модель
+#     response = llm.invoke(messages)
+#     # response -- AIMessage
+#
+#     # змінити історію
+#     messages.append(response)
+#
+#     # вивід результату
+#     print(f'AI: {response.content}')
+
+# очищення історії повідомлень
+
+# створення трімер
+trimmer = trim_messages(
+    strategy='last',  # залишати останні повідомлення
+
+    token_counter=len,  # рахуємо кількість повідомлень
+    max_tokens=5,  # залишати максимум 5 повідомлення(System, AI, Human)
+
+    start_on='human',  # історія завжди починатиметься з HumanMessage
+    end_on='human',  # історія завжди закінчуватиметься з HumanMessage
+    include_system=True  # SystemMessage не чіпати
+)
 
 messages = [
-    ("system", "You are a helpful translator. Translate the user sentence to French."),
-    ("human", "I love programming."),
+    SystemMessage("""
+    Ти ввічливий чат бот. Твоя заача давати відповіді на питання
+    користувача.
+
+    Закінчуй усі відповіді фразою "Чи залишились іще питання?"
+    """)
 ]
 
-print(chat.invoke(messages))
+# # основний цикл
+# while True:
+#     # отримати повідомлення від користувача
+#     user_text = input('Ви: ')
+#
+#     # умова зупинки
+#     if user_text == '':
+#         break
+#
+#     # змінити тип даних на HumanMessage
+#     human_message = HumanMessage(user_text)
+#
+#     # змінити історію
+#     messages.append(human_message)
+#
+#     # почистити історію
+#     messages = trimmer.invoke(messages)
+#
+#     # застосувати модель
+#     response = llm.invoke(messages)
+#     # response -- AIMessage
+#
+#     # змінити історію
+#     messages.append(response)
+#
+#     # вивід результату
+#     print(f'AI: {response.content}')
+#
+#     # вивід історії
+#     print('\nІсторія')
+#     for message in messages:
+#         print(repr(message))
+#     print()
+
+
+# теж саме через ланцюг
+chain = trimmer | llm
+
+while True:
+    # отримати повідомлення від користувача
+    user_text = input('Ви: ')
+
+    # умова зупинки
+    if user_text == '':
+        break
+
+    # змінити тип даних на HumanMessage
+    human_message = HumanMessage(user_text)
+
+    # змінити історію
+    messages.append(human_message)
+
+    # застосувати модель
+    response = chain.invoke(messages)
+    # response -- AIMessage
+
+    # змінити історію
+    messages.append(response)
+
+    # вивід результату
+    print(f'AI: {response.content}')
+
+    # вивід історії
+    print('\nІсторія')
+    for message in messages:
+        print(repr(message))
+    print()
