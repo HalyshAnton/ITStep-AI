@@ -1,5 +1,5 @@
 # streamlit
-from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_google_genai import ChatGoogleGenerativeAI, GoogleGenerativeAIEmbeddings
 from langchain.prompts import PromptTemplate
 from langchain_community.utilities import GoogleSerperAPIWrapper
 from langgraph.prebuilt import create_react_agent
@@ -32,6 +32,11 @@ api_key = st.secrets.get('GEMINI_API_KEY')
 llm = ChatGoogleGenerativeAI(
     model='gemini-2.0-flash',  # назва моделі
     google_api_key=api_key,    # ваша API
+)
+
+embeddings = GoogleGenerativeAIEmbeddings(
+    model="models/text-embedding-004",  # назва моделі
+    google_api_key=api_key
 )
 
 # чат бот
