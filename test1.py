@@ -96,7 +96,7 @@ if user_text:
 
 # вивід історії спідкування
 for message in st.session_state['messages']:
-    text = message.content + "#####"
+    text = message.content + "!!!!!"
 
     # визначити чиє повідомлення
     if isinstance(message, HumanMessage):
