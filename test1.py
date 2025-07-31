@@ -1,6 +1,8 @@
 # streamlit
 from langchain_google_genai import ChatGoogleGenerativeAI, GoogleGenerativeAIEmbeddings
 from langchain.prompts import PromptTemplate
+from pinecone import Pinecone, ServerlessSpec
+from langchain_pinecone import PineconeVectorStore
 from langchain_community.utilities import GoogleSerperAPIWrapper
 from langgraph.prebuilt import create_react_agent
 from langchain_core.messages import (
@@ -25,6 +27,7 @@ st.markdown("Простий текст. Можливо опис вашого з�
 
 # отримати сам ключ
 api_key = st.secrets.get('GEMINI_API_KEY')
+pinecone_api_key = st.secrets.get('PINECONE_API_KEY')
 
 # створення чат моделі
 # Велика мовна модель(llm)
@@ -37,6 +40,29 @@ llm = ChatGoogleGenerativeAI(
 embeddings = GoogleGenerativeAIEmbeddings(
     model="models/text-embedding-004",  # назва моделі
     google_api_key=api_key
+)
+
+pc = Pinecone(api_key=pinecone_api_key)
+
+# назва таблиці з документами
+index_name = "itstep"
+
+if not pc.has_index(index_name):
+    pc.create_index(
+        name=index_name,   # назва таблиці
+        dimension=768,     # кількість чисел у векторі
+        metric="cosine",   # формула для обрахунку схожості
+        spec=ServerlessSpec(
+            cloud="aws",         # хмарна платформа(Амазон)
+            region="us-east-1"   # регіон де знаходиться сервер(впливає на оплату)
+        )
+    )
+
+index = pc.Index(index_name)
+
+vector_store = PineconeVectorStore(
+    index=index,
+    embedding=embeddings
 )
 
 # чат бот
