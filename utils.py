@@ -72,33 +72,42 @@ def add_speckle_noise(image, mean=0, std=0.1):
     return noisy_image
 
 
-@trackbar_decorator(max_sat=(0, 255), max_val=(0, 255))
-def lesson2_hsv_range(img, max_sat, max_val):
-    hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-    h, s, v = cv2.split(hsv)
+@trackbar_decorator(value=(0, 255))
+def lesson1_image(value):
+    img = np.full((400, 400), value, dtype=np.uint8)
+    return img
 
-    s = np.clip(max_sat/s.max()*s, 0, 255)
-    v = np.clip(max_val / v.max() * v, 0, 255)
 
-    hsv[:, :, 1] = s.astype(np.uint8)
-    hsv[:, :, 2] = v.astype(np.uint8)
+@trackbar_decorator(b=(0, 255), g=(0, 255), r=(0, 255))
+def lesson2_bgr_range(b, g, r):
+    img = np.empty((400, 400, 3), dtype=np.uint8)
+
+    img[:, :, 0] = b
+    img[:, :, 1] = g
+    img[:, :, 2] = r
+
+    return img
+
+
+@trackbar_decorator(hue=(0, 180), sat=(255, 255), val=(255, 255))
+def lesson2_hsv_range(hue, sat, val):
+    hsv = np.empty((400, 400, 3), dtype=np.uint8)
+
+    hsv[:, :, 0] = hue
+    hsv[:, :, 1] = sat
+    hsv[:, :, 2] = val
 
     img = cv2.cvtColor(hsv, cv2.COLOR_HSV2BGR)
     return img
 
 
-@trackbar_decorator(max_l=(0, 255), max_a=(0, 255), max_b=(0, 255))
-def lesson2_lab_range(img, max_l, max_a, max_b):
-    lab = cv2.cvtColor(img, cv2.COLOR_BGR2LAB)
-    l, a, b = cv2.split(lab)
+@trackbar_decorator(l=(0, 255), a=(0, 255), b=(0, 255))
+def lesson2_lab_range(l, a, b):
+    lab = np.empty((400, 400, 3), dtype=np.uint8)
 
-    l = np.clip(max_l / l.max() * l, 0, 255)
-    a = np.clip(max_a / a.max() * a, 0, 255)
-    b = np.clip(max_b / b.max() * b, 0, 255)
-
-    lab[:, :, 0] = l.astype(np.uint8)
-    lab[:, :, 1] = a.astype(np.uint8)
-    lab[:, :, 2] = b.astype(np.uint8)
+    lab[:, :, 0] = l
+    lab[:, :, 1] = a
+    lab[:, :, 2] = b
 
     img = cv2.cvtColor(lab, cv2.COLOR_LAB2BGR)
     return img
