@@ -1,76 +1,87 @@
 import numpy as np
-import cv2
 
-
-# масив
-# array = np.array([[1, 2, 3], # перший рядок масиву
-#                   [4, 5, 6] # другий рядок масив
-#                   ])
+# # створення масиву
+# array = np.array([1, 2, 3, 4, 5])
 #
 # print(array)
+# print(array.shape)  # розмір масиву
+# print(array.dtype)  # тип даних в одній комірці масиву
 #
-# print(array.dtype)  # тип даних одного елемента
-# print(array.shape)  # розмір (рядочки, стовпчики)
+# # двовимірний масив(таблиця/матриця)
+# array = np.array([[1, 2, 3, 4, 5],
+#                   [6, 7, 8.5, 9, 10]])
 #
-# # індексація
-# print(array[0, 2])   # елемент рядок 0 та стовпчик 2
-# print(array[0])      # рядок з індексом 0
-# print(array[0:2])    # рядки з 0 по 2
-# print(array[:, 1])   # стовпчик з індексом 1
+# print(array)
+# print(array.shape)  # розмір масиву
+# print(array.dtype)  # тип даних в одній комірці масиву
 
 
-# зображення
-# читання
-
-img = cv2.imread("data/lesson1/cameraman.png", # шлях до файлу
-                 cv2.IMREAD_GRAYSCALE          # зображення чорнобіле
-                 )
-
-# # print(img)
-# # print(img.dtype)
-# # print(img.shape)
+# # порівнння швидкості для масивів та списків
+# import time
 #
-# # uint8 -- ціле число в діапазоні 0 до 255
 #
-# # виведення
-# # cv2.imshow("test img",  # назва зображення
-# #            img)
+# N = 10_000_000
+# nums_list = list(range(N))
+# nums_array = np.array(range(N))
 #
-# # індексаці
-# segment = img[50:200]  # рядки з 50 по 200
+# start = time.time()
+# res = sum(nums_list)
+# end = time.time()
 #
-# print(segment)
-# print(segment.dtype)
-# print(segment.shape)
+# print(f"Python list: {end - start:0.5f} sec")
 #
-# #cv2.imshow('segment', segment)
+# start = time.time()
+# res = np.sum(nums_array)
+# end = time.time()
 #
-# # збільшити всі пікселі у segment на 20
-# segment += 20
+# print(f"Numpy array: {end - start:0.5f} sec")
+
+
+# завжди використовувати функції numpy
+# цикл for -- це велике зло
+
+# # створення та розміри
 #
-# cv2.imshow("test img",  # назва зображення
-#            img)
+# nums = np.arange(10, 20, 2)  # масив з діапазону, як в range
+# print(nums)
 #
-# # головний цикл
-# cv2.waitKey(0)
+# nums = np.zeros(shape=(3, 4))  # масив з нулів
+# print(nums)
+#
+# # змінити розмір масиву
+# nums = np.arange(10, 20)
+# new_nums = nums.reshape((2, 5))
+# print(new_nums)
+# print(new_nums.shape)
 
+# індексація
+# nums = np.arange(10, 20)
+#
+# print(nums)
+# # print(nums[2])
+# # print(nums[2:5])  # зріз з 2(включно) по 5(не включно)
+# # print(nums[2:7:2])  # зріз з 2(включно) по 7(не включно) крок 2
+# # print(nums[:3])    # перші 3
+# # print(nums[-3:])  # останні 3
+#
+# nums[2] = 0
+#
+# #nums[2:7] = 0
+# nums[2:7] *= -1
+#
+# print(nums)
 
-# умови з масивами
-# маска для пікселів які більше 128
-mask = img > 128
+nums = np.array([[1, 2, 3, 4, 5],
+                  [6, 7, 8.5, 9, 10]])
 
-print(mask.shape)
-print(mask.dtype)
+print(nums.shape)  # рядки, стовпчики
+# для двовимірних масивів йже 2 індекса -- рядка та стовпчика
 
-# дісати пікселі, які відповідають масці
+print(nums[1, 2])    # 8.5
+print(nums[1])       # рядок з індексом 1
+print(nums[1, 2:4])  # рядок з індексом 1, стовпчики з 2 по 4
+print(nums[0:2, 1:4])  # блок рядки з 0 по 2 та стовпчики з 1 по 4
+print(nums[:, 3])    # стовпчик 3
 
-# print(img[mask])
-
-img[mask] = 255  # всі пікселі що відповідають масці
-img[~mask] = 0   # всі пікселі що не відповідають масці
-
-cv2.imshow('', img)
-cv2.waitKey(0)
-
-
-
+nums[0:2, 1:4] += 100
+print(nums)
