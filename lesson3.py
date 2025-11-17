@@ -69,36 +69,68 @@
 #
 # utils.lesson2_hsv_range()
 
+# import cv2
+#
+#
+# img = cv2.imread('data/lesson2/lego.jpg', cv2.IMREAD_COLOR)
+# img = cv2.resize(img, (500, 500))
+#
+# # img -- bgr
+# cv2.imshow('bgr', img)
+#
+# # перевести в hsv
+# hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+#
+# print(hsv.shape)
+# print(hsv.dtype)
+#
+# # # думає що hsv -- bgr
+# # cv2.imshow('hsv', hsv)
+#
+# # h -- 100-130
+# # s -- 150-255
+# # v -- 140-255
+# mask_blue = cv2.inRange(
+#     hsv,
+#     (100, 150, 140), # нижні межі
+#     (130, 255, 255)  # верхні межі
+# )
+#
+# print(mask_blue.shape)
+# print(mask_blue.dtype)
+#
+# cv2.imshow('mask_blue', mask_blue)
+#
+# cv2.waitKey(0)
+
+
 import cv2
 
 
-img = cv2.imread('data/lesson2/lego.jpg', cv2.IMREAD_COLOR)
+img = cv2.imread('data/lesson2/bio_low_contrast.jpg', cv2.IMREAD_GRAYSCALE)
 img = cv2.resize(img, (500, 500))
 
 # img -- bgr
-cv2.imshow('bgr', img)
+cv2.imshow('origin', img)
 
-# перевести в hsv
+
+# наведення різкості(конраст)
+# вирівнювання гістрограм(працює лише для чорнобілих)
+result = cv2.equalizeHist(img)
+
+cv2.imshow('result', result)
+
+img = cv2.imread('data/lesson2/cell.png')
 hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
 
-print(hsv.shape)
-print(hsv.dtype)
+# вирівнюємо яскравість
+value = hsv[:, :, 2]
+new_value = cv2.equalizeHist(value)
+hsv[:, :, 2] = new_value
 
-# # думає що hsv -- bgr
-# cv2.imshow('hsv', hsv)
+# перевести назад в bgr
+new_img = cv2.cvtColor(hsv, cv2.COLOR_HSV2BGR)
 
-# h -- 100-130
-# s -- 150-255
-# v -- 140-255
-mask_blue = cv2.inRange(
-    hsv,
-    (100, 150, 140), # нижні межі
-    (130, 255, 255)  # верхні межі
-)
-
-print(mask_blue.shape)
-print(mask_blue.dtype)
-
-cv2.imshow('mask_blue', mask_blue)
-
+cv2.imshow('contrast', new_img)
+cv2.imshow('origin', img)
 cv2.waitKey(0)
