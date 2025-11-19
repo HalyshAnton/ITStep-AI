@@ -20,7 +20,7 @@ import cv2
 import utils
 import numpy as np
 
-img = cv2.imread('data/lesson3/castello_noised.png')
+img = cv2.imread('data/lesson3/darken_page.jpg')
 
 # # ядро згортки(фільтр, масив з коефіцієнтами)
 # kernel = np.array(
@@ -58,23 +58,48 @@ img = cv2.imread('data/lesson3/castello_noised.png')
 #
 # cv2.imshow('res', res)
 
-# застосування -- усунення шуму
-#img = utils.add_salt_and_pepper_noise(img, 0.001, 0.001)
-img = utils.add_gaussian_noise(img, 0, 5)
+# # застосування -- усунення шуму
+# #img = utils.add_salt_and_pepper_noise(img, 0.001, 0.001)
+# img = utils.add_gaussian_noise(img, 0, 5)
+#
+# # гаусове розмиття
+# res = cv2.GaussianBlur(
+#     img,
+#     (13, 13),   # розмір ядра
+#     2       # чим більше тим більше розвиття
+# )
+#
+# # двосторонній фільтр
+# res = cv2.bilateralFilter(
+#     img,
+#     d=9,  # розмір ядра
+#     sigmaColor=75,   # наскільки зберігати різкість кольору
+#     sigmaSpace=75,   # те ж саме що й в GaussianBlur
+# )
+#
+# cv2.imshow('res', res)
 
-# гаусове розмиття
-res = cv2.GaussianBlur(
-    img,
-    (13, 13),   # розмір ядра
-    2       # чим більше тим більше розвиття
-)
+# бінарізація
 
-# двосторонній фільтр
-res = cv2.bilateralFilter(
-    img,
-    d=9,  # розмір ядра
-    sigmaColor=75,   # наскільки зберігати різкість кольору
-    sigmaSpace=75,   # те ж саме що й в GaussianBlur
+# зображення має бути чорно біле
+gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+# проста бінарізація
+# threshold = 5  # порогове значення
+#
+# res = gray.copy()
+# mask = res > threshold
+# res[mask] = 255
+# res[~mask] = 0
+
+# адаптивна бінарізація
+res = cv2.adaptiveThreshold(
+    gray,
+    255,  #  інтенчивність для білого кольору
+    cv2.ADAPTIVE_THRESH_MEAN_C,   # фурмула згортки(гаус)
+    cv2.THRESH_BINARY,    # це не чіпаємо
+    11,    # розмір ядра для згортки
+    2           # наскільки чутливою має бути бінарізація
 )
 
 cv2.imshow('res', res)
