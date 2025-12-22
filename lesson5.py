@@ -5,6 +5,7 @@ import os
 import dotenv
 
 from langchain_google_genai import ChatGoogleGenerativeAI
+from langchain_community.utilities import GoogleSerperAPIWrapper
 from langgraph.prebuilt import create_react_agent
 from langchain_core.messages import (
     HumanMessage,
@@ -16,12 +17,13 @@ from langchain_core.messages import (
 
 # завантаження апі ключа
 dotenv.load_dotenv()
-api_key = os.getenv("GEMINI_API_KEY")
+gemini_api_key = os.getenv("GEMINI_API_KEY")
+serper_api_key = os.getenv("SERPER_API_KEY")
 
 # створити llm
 llm = ChatGoogleGenerativeAI(
     model='gemini-2.5-flash',
-    api_key=api_key,
+    api_key=gemini_api_key,
 )
 
 # інструмент -- функція
@@ -51,10 +53,27 @@ def get_weather(city: str, time: str) -> str:
     return f"У {city} о {time} буде сонячно"
 
 
+# інструмент для пошуку в інтернеті
+searcher = GoogleSerperAPIWrapper(serper_api_key=serper_api_key)
+
+def search(query: str) -> str:
+    """
+    Шукає інформацію в інтернеті за запитом користувача
+
+    :param query: запит користувача
+    :return: результати пошуку
+    """
+
+    result = searcher.run(query)
+    print(result)
+
+    return result
+
+
 # створення агента
 agent = create_react_agent(
     model=llm,   # мовна модель
-    tools=[product, get_weather]
+    tools=[product, get_weather, search]
 )
 
 # історія повідомлень + інструкції
@@ -68,6 +87,7 @@ messages = [
         У тебе є доступ до таких інструментів:
         * product
         * get_weather
+        * search
         """
     )
 ]
