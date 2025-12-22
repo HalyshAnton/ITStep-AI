@@ -64,10 +64,10 @@ def search(query: str) -> str:
     :return: результати пошуку
     """
 
-    result = searcher.run(query)
-    print(result)
+    results = searcher.results(query)
+    print(results)  # результати пошуку
 
-    return result
+    return results
 
 
 # створення агента
@@ -87,7 +87,7 @@ messages = [
         У тебе є доступ до таких інструментів:
         * product
         * get_weather
-        * search
+        * search -- завжди давай посилання на новини
         """
     )
 ]
