@@ -98,8 +98,19 @@ ids = [str(uuid4()) for _ in range(len(docs))]
 
 # print(ids)
 
-# вантаження документів у базу даних
+# завантаження документів у базу даних
 # vector_store.add_documents(
 #     documents=docs,
 #     ids=ids
 # )
+
+# отримати схожі документи
+user_input = "Чи шкідливо бігати більше 10 км?"
+
+result_docs = vector_store.similarity_search(
+    user_input,   # текст для порівняння схожості
+    k=2,          # кількість документів у відповіді
+)
+
+for doc in result_docs:
+    print(doc)
