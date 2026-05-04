@@ -6,7 +6,7 @@ import dotenv
 
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_community.utilities import GoogleSerperAPIWrapper
-from langgraph.prebuilt import create_react_agent
+from langchain.agents import create_agent
 from langchain_core.messages import (
     HumanMessage,
     AIMessage,
@@ -67,11 +67,11 @@ def search(query: str) -> str:
     results = searcher.results(query)
     print(results)  # результати пошуку
 
-    return results
+    return str(results)
 
 
 # створення агента
-agent = create_react_agent(
+agent = create_agent(
     model=llm,   # мовна модель
     tools=[product, get_weather, search]
 )

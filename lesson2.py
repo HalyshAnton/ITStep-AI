@@ -2,7 +2,7 @@ import os
 import dotenv
 
 from langchain_google_genai import GoogleGenerativeAI
-from langchain.prompts import PromptTemplate
+from langchain_core.prompts import PromptTemplate
 
 # завантаження апі ключа
 dotenv.load_dotenv()
