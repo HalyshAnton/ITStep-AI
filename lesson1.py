@@ -1,19 +1,34 @@
 import numpy as np
+from torch._C import dtype
 
-# # створення масиву
-# array = np.array([1, 2, 3, 4, 5])
+# створення масиву
+
+# nums = np.array([1, 2, 3, 4, 5])
+# print(nums)
+# print(type(nums))
 #
-# print(array)
-# print(array.shape)  # розмір масиву
-# print(array.dtype)  # тип даних в одній комірці масиву
+# print(nums.shape)  # розмір масиву
+# print(nums.dtype)  # тип даних одного елемента в комірці
+# # int64 -- 64 біта на одну комірку
 #
-# # двовимірний масив(таблиця/матриця)
-# array = np.array([[1, 2, 3, 4, 5],
-#                   [6, 7, 8.5, 9, 10]])
+# # вказати тип даних
+# nums = np.array([1, 2, 3, 4, 5], dtype=np.float32)
+# print(nums)
+# print(nums.shape)
+# print(nums.dtype)
+
+# двовимірний масив(таблиця/матриця)
+
+# nums = np.array(
+#     [[1, 2, 3, 4],
+#      [5, 6, 7, 8],
+#      [9, 10, 11, 12]]
+# )
 #
-# print(array)
-# print(array.shape)  # розмір масиву
-# print(array.dtype)  # тип даних в одній комірці масиву
+# print(nums)
+# print(nums.shape)  # розмір масиву
+# print(nums.dtype)  # тип даних одного елемента в комірці
+
 
 
 # # порівнння швидкості для масивів та списків
@@ -35,76 +50,117 @@ import numpy as np
 # end = time.time()
 #
 # print(f"Numpy array: {end - start:0.5f} sec")
+#
+# start = time.time()
+# total = 0
+# for num in nums_array:
+#     total += num
+# end = time.time()
+#
+# print(f"Numpy array with for: {end - start:0.5f} sec")
 
 
-# завжди використовувати функції numpy
-# цикл for -- це велике зло
+# цикл for -- то є зло
+# користуєтеся numpy функція
 
-# # створення та розміри
+
+# створення та розміри
+
+# # зі списку
+# nums_list = [1, 2, 3, 4]
+# nums = np.array(nums_list)
 #
-# nums = np.arange(10, 20, 2)  # масив з діапазону, як в range
-# print(nums)
-#
-# nums = np.zeros(shape=(3, 4))  # масив з нулів
-# print(nums)
-#
-# # змінити розмір масиву
+# # аналог range
 # nums = np.arange(10, 20)
-# new_nums = nums.reshape((2, 5))
+# print(nums)
+
+# масив нулів/одиниць/випадкових чисел
+# nums = np.zeros((6,))  # вказуєте розмір
+# print(nums)
+#
+# nums = np.ones((5, 3))
+# print(nums)
+#
+# nums = np.random.rand(2, 3)  # випадкові від 0 до 1
+# print(nums)
+
+# # зміна розмірів та типів
+#
+# nums = np.arange(12)
+# print(nums)
+# print(nums.shape)
+# print(nums.dtype)
+#
+# new_nums = nums.reshape((3, 4))
 # print(new_nums)
 # print(new_nums.shape)
+# print(new_nums.dtype)
+#
+# nums_float16 = nums.astype(np.float16)
+# print(nums_float16)
+# print(nums_float16.shape)
+# print(nums_float16.dtype)
+
+
+# # перенаповнення
+# # int8 -- -128..127
+# nums = np.array([10, 20, 30, 120], dtype=np.int8)
+# print(nums)
+#
+# # збільшити всі числа на 10
+# nums = nums + 10
+# print(nums)
+
 
 # індексація
-# nums = np.arange(10, 20)
+# nums = np.array([10, 20, 30, 40, 50])
 #
-# print(nums)
-# # print(nums[2])
-# # print(nums[2:5])  # зріз з 2(включно) по 5(не включно)
-# # print(nums[2:7:2])  # зріз з 2(включно) по 7(не включно) крок 2
-# # print(nums[:3])    # перші 3
-# # print(nums[-3:])  # останні 3
-#
-# nums[2] = 0
-#
-# #nums[2:7] = 0
-# nums[2:7] *= -1
-#
+# print(nums[0])  # перший елемент
+# print(nums[3])  # 40
+# print(nums[-1])  # останній
+# print(nums[-3])  # третій з кінця
+# print(nums[1:4])  # 20 - 40
+
+
+# # індексація таблиць
+# nums = np.arange(12).reshape((4, 3))
 # print(nums)
 
-# nums = np.array([[1, 2, 3, 4, 5],
-#                   [6, 7, 8.5, 9, 10]])
+# спочатку рядки потім стовпчики
+# nums[індекс рядка, індекс стовпчика]
+
+# print(nums[1, 2])  # 5(рядок 1, стовпчик 2)
+# print(nums[3])     # весь рядок 3
+# print(nums[0:2])   # перші 2 рядка
+# print(nums[:, 1])     # стовпчик 1
+# print(nums[:, 1:3])    # два останніх стовпчика
+# print(nums[1:3, 0:2])
+
+
+
+# базові операці
+
+# nums1 = np.array([1, 2, 3])
+# nums2 = np.array([2, 2, 2])
 #
-# print(nums.shape)  # рядки, стовпчики
-# # для двовимірних масивів йже 2 індекса -- рядка та стовпчика
-#
-# print(nums[1, 2])    # 8.5
-# print(nums[1])       # рядок з індексом 1
-# print(nums[1, 2:4])  # рядок з індексом 1, стовпчики з 2 по 4
-# print(nums[0:2, 1:4])  # блок рядки з 0 по 2 та стовпчики з 1 по 4
-# print(nums[:, 3])    # стовпчик 3
-#
-# nums[0:2, 1:4] += 100
-# print(nums)
+# print(nums1 + 10)
+# print(nums1 * nums2)
+
 
 # булеві маски
-nums = np.array([[1, 20, 3, 4, 5],
-                   [6, 7, 8.5, 9, 10]])
 
-mask = nums > 7
+nums = np.array([15, 8, 17, 18, 1, 2, 3])
 
-print(mask)
-print(mask.dtype)
+mask = nums > 10
 
-print(nums[mask])  # дістати числа які відповідають масці(умові)
+# отримати елементи які відповідають масці
+print(nums[mask])
 
-nums[mask] = 0
+# всі елементи які відповідають масці збільшити в 2 рази
+nums[mask] *= 2
 print(nums)
 
-# дістати числа які не відповідають масці(умові)
-# and -- &
-# or  -- |
-# not -- ~
-print(nums[~mask])
+#всі елементи які відповідають масці замінити на -1
+nums[mask] = -1
+print(nums)
 
-# кількість чисел що білше 7
-print(np.sum(mask))
