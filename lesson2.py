@@ -1,107 +1,102 @@
-# # дз завдання 3
+# дз
 # import numpy as np
 #
-# nums = np.array([1, 2, 3], dtype=np.uint8)
 #
-# # намагається помістити результат(типу float64) у ті самі
-# # комірки(типу uint8) що не можливо -- error
-# # nums *= 0.2
-#
-# # спочатку запускається nums * 0.2 -- створюється новий масив
-# # далі запускається nums = ... -- змінюється вказівник
-# nums = nums * 0.2
-#
-# print(nums)
-# print(nums.dtype)
-# import numpy as np
-#
-# # uint8 -- 0-255
-#
-# nums = np.array([2], dtype=np.uint8)
-#
-# res = nums - 10
-# print(res)
-
-
-# # # зображення у opencv
-# import cv2
-#
-# # читання злображення
-# img = cv2.imread(
-#     'data/lesson1/cameraman.png',  # шлях до файлу
-#     cv2.IMREAD_GRAYSCALE # формат зображення
+# nums = np.array(
+#     [
+#     [1,2,3,4],
+#     [5,6,7,8],
+#     [9,10,11,12],
+#     [13,14,15,16]
+#     ]
 # )
 #
-#
-# print(type(img))
-# print(img)
-# print(img.shape)
-# print(img.dtype)
-#
-# # показати зображення
-# cv2.imshow(
-#     'image',   # назву
-#     img
-# )
-#
-#
-# # зміна розміру зображення
-# new_img = cv2.resize(img, (500, 500))
-#
-# # зміна у відсотках(на 50%)
-# new_img = cv2.resize(img, None, fx=1.5, fy=1.5)
-#
-# cv2.imshow('resized_image', new_img)
-# # програма чекає поки буде натиснута будь-яка кнопка
-# cv2.waitKey(0)
-# print('End')
+# print(nums[[0, 0, 1, 0]])
 
-
+# #  зображення у opencv
 # import utils
 #
 # utils.lesson1_image()
 
+# читання зображення
 import cv2
-import numpy as np
 
-# читання злображення
-img = cv2.imread(
-    'data/lesson1/cameraman.png',  # шлях до файлу
-    cv2.IMREAD_GRAYSCALE # формат зображення
+
+image = cv2.imread(
+    "data/lesson1/cameraman.png",  # шлях до файлу
+    cv2.IMREAD_GRAYSCALE,   # прапорець як читати зображення(чорнобіле)
 )
 
-img = cv2.resize(img, (500, 500))
+print(type(image))
+print(image.shape)
+print(image.dtype)   # uint8  (0 - 255)
+print(image)
+
+
+# показати зображення
+# cv2.imshow(
+#     "original",  # назва для зображення
+#     image           # саме зображення
+# )
+
+# щоб щображення показувалось довго треба зациклити програму
+# чекаємо поки не буде натиснута якась кнопка
+# cv2.waitKey(0)
+
+
+
+
+# зміна розміру зображення
+
+# не правильно
+# new_image = image.reshape(128, 512)
+# cv2.imshow("reshaped", new_image)
+
+
+# new_image = cv2.resize(
+#     image,
+#     (500, 500)   # новий розмір
+# )
+
+
+# в пропорціях
+# new_image = cv2.resize(
+#     image,
+#     None,
+#     fx=1.5,   # множник для висоти та ширини
+#     fy=1.5,
+# )
+
+# print(new_image.shape)
+#
+# cv2.imshow("resized", new_image)
+
+
+
+
+# segment = image[75:175, 20:240]
+# print(segment.shape)
+# print(segment.dtype)
+# cv2.imshow("segment", segment)
+
 
 # збільшення значення пікселів
 
-cv2.imshow('original', img)
-
-new_img = img.astype(np.int16)
-new_img -= 80
-
-# пікселів які опинились за межами діапазону 0-255
-# треба повернути назад
-
-# mask_255 = new_img > 255
-# new_img[mask_255] = 255
-# mask_0 = new_img < 0
-# new_img[mask_0] = 0
-
-# # те саме
-# new_img = np.clip(new_img, 0, 255)
+# import numpy as np
+# nums = np.array([100, 200], dtype=np.uint8)
+# print(nums + 80)
 #
-# new_img = new_img.astype(np.uint8)
+# image = image.astype(np.int64)
+# image[75:175, 20:240] += 80
 #
-# cv2.imshow('new', new_img)
-
-# частина зображення з 200 по 400 рядок
-segment = img[200:400]  # ті самі пікселі що і в img
-
-cv2.imshow('segment', segment)
-
-segment += 80
-
-cv2.imshow('original', img)
-cv2.imshow('segment', segment)
-
-cv2.waitKey(0)
+# mask = image > 255
+# image[mask] = 255
+#
+#
+# image = image.astype(np.uint8)
+#
+# segment = image[75:175, 20:240]
+#
+# cv2.imshow("original", image)
+# cv2.imshow("segment", segment)
+# cv2.waitKey(0)

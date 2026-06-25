@@ -1,5 +1,4 @@
 import numpy as np
-from torch._C import dtype
 
 # створення масиву
 
