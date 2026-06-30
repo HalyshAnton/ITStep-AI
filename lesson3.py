@@ -1,136 +1,107 @@
-# # дз
-# result1 = img.copy()
-# result1[:] = 0
-#
-# # те саме(створити масив 0 такого ж розміру як img)
-# result1 = np.zero_like(img)
-#
-# # проблема зі знаками \
-# r"C:\ITSTEP\ITStep-AI\data\lesson1\baboo.jpg"
-
-
-# # колір
-# import cv2
-#
-# # читати як чорно біле
-# img = cv2.imread('data/lesson2/lego.jpg', cv2.IMREAD_GRAYSCALE)
-# img = cv2.resize(img, (500, 500))
-#
-# print(img.shape)
-# print(img.dtype)
-#
-# cv2.imshow('gray', img)
-#
-# # читати як кольорове
-# img = cv2.imread('data/lesson2/lego.jpg', cv2.IMREAD_COLOR)
-# img = cv2.resize(img, (500, 500))
-#
-# print(img.shape)
-# print(img.dtype)
-#
-# # піксель формат bgr
-# print(img[220, 220]) # [60 75 230]
-#
-# cv2.imshow('color', img)
-#
-# # дістати черіоний колір з зображення
-# # img.shape = (рядки, стовпчики, колір)
-# red_part = img[:, :, 2]
-# green_part = img[:, :, 1]
-# blue_part = img[:, :, 0]
-#
-# print(red_part.shape)
-# print(red_part.dtype)
-#
-# # якщо в shape 2 числа -- показує як чорнобіле зображення
-# cv2.imshow('wrong red', red_part)
-#
-# # правильно
-# red_part = img.copy()
-# # первести синій та зелений в 0
-# red_part[:, :, 0] = 0  # blue
-# red_part[:, :, 1] = 0  # blue
-#
-# cv2.imshow('red', red_part)
-# cv2.waitKey(0)
-#
-#
-# # # rgb(bgr)
-# # import utils
-# #
-# # utils.lesson2_bgr_range()
-
-# кольоровий простір hsv
-# h -- колір  (hue)  -- кут / 2
-# s -- насиченість  (saturation)
-# v -- яскравість   (value)
-
-# import utils
-#
-# utils.lesson2_hsv_range()
-
-# import cv2
-#
-#
-# img = cv2.imread('data/lesson2/lego.jpg', cv2.IMREAD_COLOR)
-# img = cv2.resize(img, (500, 500))
-#
-# # img -- bgr
-# cv2.imshow('bgr', img)
-#
-# # перевести в hsv
-# hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-#
-# print(hsv.shape)
-# print(hsv.dtype)
-#
-# # # думає що hsv -- bgr
-# # cv2.imshow('hsv', hsv)
-#
-# # h -- 100-130
-# # s -- 150-255
-# # v -- 140-255
-# mask_blue = cv2.inRange(
-#     hsv,
-#     (100, 150, 140), # нижні межі
-#     (130, 255, 255)  # верхні межі
-# )
-#
-# print(mask_blue.shape)
-# print(mask_blue.dtype)
-#
-# cv2.imshow('mask_blue', mask_blue)
-#
-# cv2.waitKey(0)
-
-
+# колір
 import cv2
 
+# # читати як чорно біле
+# image = cv2.imread("data/lesson2/lego.jpg", cv2.IMREAD_GRAYSCALE)
+# image = cv2.resize(image, (500, 500))
+#
+# print(image.dtype)
+# print(image.shape)
+# print(image[0, 0])
+#
+# cv2.imshow("gray", image)
+#
+# # читати як кольорове
+# # за замовчуванням читає як кольорове
+# image = cv2.imread("data/lesson2/lego.jpg")
+# image = cv2.resize(image, (500, 500))
+#
+# print(image.dtype)
+# print(image.shape)
+# print(image[0, 0])
+#
+# cv2.imshow("color", image)
 
-img = cv2.imread('data/lesson2/bio_low_contrast.jpg', cv2.IMREAD_GRAYSCALE)
-img = cv2.resize(img, (500, 500))
+# формат(кольорові простори)
+# bgr -- blue green red
 
-# img -- bgr
-cv2.imshow('origin', img)
+# import utils
+# utils.lesson2_bgr_range()
 
 
-# наведення різкості(конраст)
-# вирівнювання гістрограм(працює лише для чорнобілих)
-result = cv2.equalizeHist(img)
 
-cv2.imshow('result', result)
+# дістати колір з зображення
+image = cv2.imread("data/lesson2/lego.jpg")
+image = cv2.resize(image, (500, 500))
 
-img = cv2.imread('data/lesson2/cell.png')
-hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+print(image.shape) # (рядки, стовпчики, колір)
 
-# вирівнюємо яскравість
-value = hsv[:, :, 2]
-new_value = cv2.equalizeHist(value)
-hsv[:, :, 2] = new_value
+# # отримати червоний канал(bgr)
+# red = image[:, :, 2]
+#
+#
+# # imshow сприймає як чорноюіле зображення
+# print(red.shape)
+# cv2.imshow("red", red)
 
-# перевести назад в bgr
-new_img = cv2.cvtColor(hsv, cv2.COLOR_HSV2BGR)
 
-cv2.imshow('contrast', new_img)
-cv2.imshow('origin', img)
+# # правильний спосіб
+# red = image.copy()
+#
+# # зберігаємо червоний колір, все інше в 0
+#
+# # синій
+# red[:, :, 0] = 0
+#
+# # зелений
+# red[:, :, 1] = 0
+#
+#
+# print(red.shape)
+# cv2.imshow("red", red)
+
+
+# # збільшити червоного на 10
+# image[:, :, 2] += 10
+#
+# cv2.imshow(",ore red", image)
+
+
+# кольоровий простір hsv
+# import utils
+# utils.lesson2_hsv_range()
+#
+#
+# cv2.waitKey(0)
+
+
+
+# отримати пікселі жовтого кольору
+
+cv2.imshow("orig", image)
+
+# межі для кольору в hsv
+
+# h -- 40 - 80  # колір(кути ділимо на два)
+# s -- 150 - 255  # насиченість
+# v -- 150 - 255  # скравість кольору
+
+
+lower = (40, 100, 100)  # нижні межі
+upper = (80, 255, 255)  # верхні межі
+
+
+# перевести з bgr в hsv
+hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
+
+# отримати маску для правильних піксесів
+mask = cv2.inRange(
+    hsv,
+    lower,
+    upper
+)
+
+cv2.imshow("mask", mask)
+
+
 cv2.waitKey(0)
