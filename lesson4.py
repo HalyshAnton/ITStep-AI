@@ -63,43 +63,76 @@ import utils
 
 
 
-# бінарізація
+# # бінарізація
+#
+# img = cv2.imread("data/lesson3/darken_page.jpg")
+#
+# cv2.imshow("orig", img)
+#
+# # зображення має бути чорно біле
+# gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+#
+# cv2.imshow("gray", gray)
+#
+# # проста бінарізація
+#
+# threshold = 10  # поріг для чорного
+#
+# mask = gray < threshold
+#
+# gray[mask] = 0  # все що менше 50 вважаємо чорним
+# gray[~mask] = 255  # все що більше 50 вважаємо білим
+#
+# cv2.imshow("simple bin",  gray)
+#
+#
+#
+# # адаптивна бінарізація
+#
+# res = cv2.adaptiveThreshold(
+#     gray,   # зображення з текстом(чорнобіле)
+#     255,    #  білий колір
+#     cv2.ADAPTIVE_THRESH_GAUSSIAN_C,   # фільтр для обрахунку порогу(гаус)
+#     cv2.THRESH_BINARY,   # це просто треба вказати
+#     21,   # розмір фільтру
+#     2,          # наскільки піксель має відрізнятися від порогу
+# )
+#
+#
+# cv2.imshow("adaptive", res)
+
+
+# декоратор
+
+import utils
+
+
+# в декораторі вказується "межі" для кожного параметру
+@utils.trackbar_decorator(blockSize=(1, 21), C=(0, 10))
+def my_func(gray, blockSize, C):
+    # перевірка на розмір фільтру
+    if blockSize % 2 == 0:
+        blockSize += 1
+
+    if blockSize < 3:
+        blockSize = 3
+
+    res = cv2.adaptiveThreshold(
+        gray,  # зображення з текстом(чорнобіле)
+        255,  # білий колір
+        cv2.ADAPTIVE_THRESH_GAUSSIAN_C,  # фільтр для обрахунку порогу(гаус)
+        cv2.THRESH_BINARY,  # це просто треба вказати
+        blockSize,  # розмір фільтру
+        C,  # наскільки піксель має відрізнятися від порогу
+    )
+
+    return res   # функція має повертати оброблене зображення
+
 
 img = cv2.imread("data/lesson3/darken_page.jpg")
-
-cv2.imshow("orig", img)
-
-# зображення має бути чорно біле
+img = cv2.resize(img, None, fx=0.6, fy=0.6)
 gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-
-cv2.imshow("gray", gray)
-
-# проста бінарізація
-
-threshold = 10  # поріг для чорного
-
-mask = gray < threshold
-
-gray[mask] = 0  # все що менше 50 вважаємо чорним
-gray[~mask] = 255  # все що більше 50 вважаємо білим
-
-cv2.imshow("simple bin",  gray)
-
-
-
-# адаптивна бінарізація
-
-res = cv2.adaptiveThreshold(
-    gray,   # зображення з текстом(чорнобіле)
-    255,    #  білий колір
-    cv2.ADAPTIVE_THRESH_GAUSSIAN_C,   # фільтр для обрахунку порогу(гаус)
-    cv2.THRESH_BINARY,   # це просто треба вказати
-    21,   # розмір фільтру
-    2,          # наскільки піксель має відрізнятися від порогу
-)
-
-
-cv2.imshow("adaptive", res)
+my_func(gray)
 
 
 
