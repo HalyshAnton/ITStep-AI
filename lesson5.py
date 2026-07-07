@@ -81,6 +81,13 @@ while True:
     )
     cv2.imshow("adapt", adapt)
 
+
+    # очитка від шуму морфологічними операторами
+    res = cv2.dilate(adapt, (3, 3), iterations=4)
+    res = cv2.erode(res, (3, 3), iterations=4)
+
+    cv2.imshow("morph", res)
+
     # запис відео у файл
     out_writer.write(adapt)
 
