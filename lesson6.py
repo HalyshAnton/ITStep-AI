@@ -79,6 +79,7 @@ print(conf.dtype)
 # рамка(box)
 box = boxes[0]  # дані першого обєкта
 
+print(box)
 print(box.conf)
 print(box.cls)  # індекс класу
 print(box.xyxy)  # координати меж
