@@ -2,7 +2,7 @@
 
 import cv2
 import ultralytics
-from fontTools.varLib.instancer import names
+
 
 # створення моделі
 # s -- small(розмір моделі)
@@ -77,7 +77,7 @@ print(conf.dtype)
 
 
 # рамка(box)
-box = boxes[0]  # дані першого обєкта
+box = boxes[2]  # дані першого обєкта
 
 print(box)
 print(box.conf)
@@ -98,18 +98,54 @@ class_id = int(cls[0])
 class_name = names[class_id]
 print(f"Клас першого обєкта {class_name}")
 
-# отримати перший об'єкт
-
 
 # координати
+xyxy = box.xyxy
+print(xyxy)
 
 # переведення координат в int
+xyxy = xyxy.cpu().numpy()
+xyxy = xyxy.astype(int)
 
+print(xyxy)
 
 
 # вирізати об'єк з всього зображення
+x1, y1, x2, y2 = xyxy[0]
+
+# region of interest
+# x - стовпчики
+# y - рядочки
+roi = img[y1:y2, x1:x2]
+
+cv2.imshow(f"roi {class_name = } {conf[0] = }", roi)
+
 
 
 # # відео
+while True:
+    success, frame = cap.read()
+
+    if not success:
+        break
+
+    frame = cv2.resize(frame, None, fx=0.5, fy=0.5)
+
+    results = model.predict(frame)
+    result = results[0]
+
+    cv2.imshow("results", result.plot())
+
+    boxes = result.boxes
+
+    # об'єкт з індексом 3
+    box = boxes[3]
+
+    conf = box.conf
+    cls = box.cls
+    xyxy = box.xyxy
+
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
 
 cv2.waitKey(0)
