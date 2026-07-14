@@ -1,113 +1,137 @@
 # сегментація зображень
-import ultralytics
+from ultralytics import YOLO
 import numpy as np
 import cv2
 
 # модель для сегментації
-model = ultralytics.YOLO('yolo11s-seg.pt')
+model = YOLO("yolo11s-seg.pt")
 
-img = cv2.imread('data/lesson_seg/human.jpg')
-
-# # застосування моделі
-# # results -- list з результами для кожного зображення в predict
+# img = cv2.imread("data/lesson_seg/human.jpg")
+# cv2.imshow("orig", img)
+# print(img.shape)
+#
+# # # застосування моделі
 # results = model.predict(
 #     img,
-#     # conf=0.5,
-#     # iou=0.1
+#     device="cpu",
 # )
+# # results -- список результатів для кожного зображення
 #
-# # дістати результати для першого(єдиного) зображення
+# # # дістати результати для першого(єдиного) зображення
 # result = results[0]
+# print(result)
 #
-# # візуалізація результату
-# res_img = result.plot(
-#     boxes=True,   # чи показувати рамки(boxes)
-#     masks=True,    # чи показувати маски сегментації(boxes)
-# )
 #
-# # маски об'єктів
-# masks = result.masks.data
+# # # візуалізація результату
+# res_img = result.plot()
+# cv2.imshow("res", res_img)
+#
+#
+# # # маски об'єктів
+# masks = result.masks
+#
 # # print(masks)
-# # print(masks.shape)  # (кількість об'єктів, висота, ширина)
-#
-# # класи об'єктів
-# cls = result.boxes.cls
-# print(cls)
-#
-# # назви класів
-# names = result.names
-# print(names)
-#
-# # де знаходиться людина
-# idx = 0
-# # маска людини
-# mask = masks[idx]
-# # print(mask)
-# # print(mask.shape)
-#
-# # переведення маски у формат opencv
-# mask = mask.cpu()   # відключення від графічного процесора
-# mask = mask.numpy() # переведення у масив numpy
-# mask = mask.astype(np.uint8)   # зміна типу даних
-# mask *= 255         # заміна 1 на 255 щоб було видно
 #
 #
-# # print(mask)
-# # print(mask.dtype)
-# # print(np.unique((mask)))  # унікальні значення в масиві
+# # # класи об'єктів
+# boxes = result.boxes
+# print(boxes)
+#
+#
+# # # назви класів
+# print(boxes.cls)
+#
+#
+# # # де знаходиться людина
+# masks_data = masks.data
+# # # маска людини
+#
+# human_mask = masks_data[0]
+#
+# # # переведення маски у формат opencv
+# human_mask = human_mask.cpu().numpy()
+# print(human_mask.shape)  # розмір не співпадає з оригінальним зображеннямр
+# print(human_mask.dtype)
+#
+# # перевести в тип даних uint8
+# human_mask = human_mask.astype(np.uint8)
+#
+# # там 0 та 1, мають бути 0 та 255
+# human_mask *= 255
+#
+# # змінити розмір до оригінального
+# human_mask = cv2.resize(human_mask, (600, 400))
+#
+# cv2.imshow("mask", human_mask)
 
 
 # відео
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture("data/lesson8/cars+bikes.mp4")  # відеокамера
+
 
 # зображення фону
-background_img = cv2.imread('data/lesson4/canal.png')
-cv2.imshow('background', background_img)
+background = cv2.imread("data/lesson4/canal.png")
 
-# зміна розміру зображення з фоном
-height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+# отримати розміри зображення
 width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
+height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
-background_img = cv2.resize(background_img, (width, height))
+# # фон має бути того ж розміру що і зображення на відео
+background = cv2.resize(background, (width, height))
 
 while True:
-    success, img = cap.read()
+    success, frame = cap.read()
 
     if not success:
         break
 
+    cv2.imshow("orig", frame)
+
+    # модель
+    results = model.predict(
+        frame,
+        device="cpu"
+    )
+
+    result = results[0]
+    res = result.plot()
+
+    # дістати маску
+    masks = result.masks
+    masks_data = masks.data
+
+    # маска об'єкта з найвищою ймовірністю(людина в кадрі)
+    human_mask = masks_data[0]
+
+    # обробка маски(щоб намалюти)
+    human_mask = human_mask.cpu().numpy()
+    human_mask = human_mask.astype(np.uint8)
+    human_mask *= 255
+    human_mask = cv2.resize(human_mask, (width, height))
+
+    cv2.imshow("mask", human_mask)
+
+    # заміна фону
+
+    # маска має місти True або False
+    mask = human_mask.astype(bool)
+
+    #frame[~mask] = background[~mask]
+
+    # розмиття фону
+    blured_frame = cv2.GaussianBlur(frame, (51, 51), sigmaX=10)
+    frame[~mask] = blured_frame[~mask]
+
+    cv2.imshow("with background", frame)
+
+    cv2.imshow("res", res)
+
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 
-    # застосувати модель
-    results = model.predict(img)
-    result = results[0]
+cap.release()
+cv2.destroyAllWindows()
 
-    res_img = result.plot()
 
-    # маска
-    masks = result.masks.data
-    mask = masks[0]
-    mask = mask.cpu()
-    mask = mask.numpy()
-    mask = mask.astype(np.uint8)
-    mask *= 255
 
-    # добавити фон
-    mask_bool = mask.astype(bool)
-
-    # заміна пікселів які не людина
-    img[~mask_bool] = background_img[~mask_bool]
-
-    cv2.imshow('res', res_img)
-    cv2.imshow('mask', mask)
-    cv2.imshow('original', img)
-
-    # print(f'{img.shape = }')
-    # print(f'{mask.shape = }')
-    # print(f'{background_img.shape = }')
-
-# cv2.imshow('mask', mask)
-# cv2.imshow('result', res_img)
-# cv2.imshow('original', img)
-# cv2.waitKey(0)
+cv2.waitKey(0)
