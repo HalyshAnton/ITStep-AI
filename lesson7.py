@@ -96,6 +96,7 @@ while True:
     result = results[0]
     res = result.plot()
 
+
     # дістати маску
     masks = result.masks
     masks_data = masks.data
