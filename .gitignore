@@ -165,3 +165,9 @@ cython_debug/
 practice/
 random_generator.py
 students.csv
+
+data/yolo_dataset
+data/yolo_isic
+runs
+tmp.py
+yolo*
