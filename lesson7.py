@@ -6,20 +6,20 @@ import cv2
 # модель для сегментації
 model = YOLO("yolo11s-seg.pt")
 
-# img = cv2.imread("data/lesson_seg/human.jpg")
-# cv2.imshow("orig", img)
-# print(img.shape)
-#
-# # # застосування моделі
-# results = model.predict(
-#     img,
-#     device="cpu",
-# )
-# # results -- список результатів для кожного зображення
-#
-# # # дістати результати для першого(єдиного) зображення
-# result = results[0]
-# print(result)
+img = cv2.imread("data/lesson_seg/human.jpg")
+cv2.imshow("orig", img)
+print(img.shape)
+
+# # застосування моделі
+results = model.predict(
+    img,
+    device="cpu",
+)
+# results -- список результатів для кожного зображення
+
+# # дістати результати для першого(єдиного) зображення
+result = results[0]
+print(result)
 #
 #
 # # # візуалізація результату

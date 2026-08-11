@@ -37,7 +37,7 @@ results = model.predict(
     #classes=[0, 1],  # класи які враховувати(див result.names)
 )
 # print(type(results))
-# print(results)
+print(results)
 
 # results -- список з одним елементом
 # отримати результ
@@ -54,7 +54,7 @@ print(names)
 # самі об'єкти
 boxes = result.boxes
 # print(type(boxes))
-# print(boxes)
+print(boxes)
 
 
 # візуалізація результів
