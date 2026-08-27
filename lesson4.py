@@ -6,6 +6,7 @@ from langchain_core.messages import (
     HumanMessage,
     AIMessage,
     SystemMessage,
+    BaseMessage,
     trim_messages,
 )
 
@@ -51,14 +52,14 @@ messages = [
 # чатбот
 
 # створенні списку для історії повідомлень(ише інструкції)
-messages = [
+messages: list[BaseMessage] = [
     SystemMessage("""
     Ти -- ввічливий чатбот
     Твоя задача підтримувати спілкування з користувач
 
     ###ІНСТРУКЦІЇ###
     1. Відповіді мають дути короткими(до 2 речень)
-    """)
+    """),
 ]
 
 # # цикл для спілкування
@@ -185,7 +186,7 @@ while True:
     response = chain.invoke(messages)
 
     # вивести на екран відповідь
-    print(f"AI: {response.content[0]['text']}")
+    print(f"AI: {response.text}")
 
     # добавити response в історію спілкування
     messages.append(response)
