@@ -1,97 +1,103 @@
-import os
 import dotenv
+import os
 
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.messages import (
     HumanMessage,
     AIMessage,
     SystemMessage,
-    trim_messages, BaseMessage
+    trim_messages,
 )
 
-
-# завантаження апі ключа
+# завантадити дані з .env
 dotenv.load_dotenv()
+
 api_key = os.getenv("GEMINI_API_KEY")
 
-# створити llm
+
+# # модель
 llm = ChatGoogleGenerativeAI(
-    model='gemini-2.5-flash-lite',
-    api_key=api_key,
+    model="gemini-3.5-flash-lite",   # назва моделі
+    api_key=api_key    # ключ до сервера з моделлю
 )
 
 # # історія повідомлень
-# messages = [
-#     # перше повідомлення з основними інструкціями(промпт)
-#     SystemMessage(
-#         """
-#         Ти -- ввічливий чат бот, твоя зада давити короткі та
-#         чіткі відповіді на питання
-#         """
-#     ),
-#     HumanMessage("Привіт"),
-#     AIMessage("Привіт, щоб ти зотів дізнатись?"),
-#     HumanMessage("Порекомендуй цікавий фільм про космос")
-# ]
-#
-#
-# # дати відповідь на очтаннє повідомлення
-# # враховуючи історію спілкування та основні інструкції
-#
+messages = [
+    # список усіх повідомлень в чаті
+    # на початку завжди йде SystemMessage -- з інструкціями для чатботу
+    SystemMessage("""
+    Ти -- ввічливий чатбот
+    Твоя задача підтримувати спілкування з користувач
+    
+    ###ІНСТРУКЦІЇ###
+    1. Відповіді мають дути короткими(до 2 речень)
+    """),
+
+    # всі наступні елементи в списку -- повідомлення від користувач та відповіді llm
+    HumanMessage("Привіт"),
+    AIMessage("Привіт, як справи?"),
+    HumanMessage("Порекомендуй цікавий фільм"),
+]
+
+
+# використання моделі
+# моделі треба передати всю історію спілкування
 # response = llm.invoke(messages)
 #
 # print(type(response))
 # print(response)
-# print(repr(response))
 
 
-# простий чатбот
+# чатбот
 
-# історія повідомлень
-# на початку лише інструкції
-# messages = [
-#     SystemMessage(
-#         """
-#         Ти -- ввічливий чат бот, який імітує Толкіна. Давай короткі відповіді
-#         на питання користувача
-#         """
-#     )
-# ]
-#
+# створенні списку для історії повідомлень(ише інструкції)
+messages = [
+    SystemMessage("""
+    Ти -- ввічливий чатбот
+    Твоя задача підтримувати спілкування з користувач
+
+    ###ІНСТРУКЦІЇ###
+    1. Відповіді мають дути короткими(до 2 речень)
+    """)
+]
+
+# # цикл для спілкування
 # while True:
-#     user_query = input("Ви: ")
+#     # отримати повідомлення від користувача
+#     user_text = input("Ви: ")
 #
-#     # закіцнчуємо якщо натиснути Enter
-#     if user_query == '':
+#     # перевірка для кінця спілкування
+#     if user_text == "":
 #         break
 #
-#     # переволимо повідомлення в HumanMessage
-#     human_message = HumanMessage(user_query)
+#     # створити HumanMessage
+#     human_message = HumanMessage(content=user_text)
 #
-#     # добавляємо до історії повідомлень
+#     # додати повідемлення в історії
 #     messages.append(human_message)
 #
-#     # запускаємо модель
+#     # отримати відповідь моделі
 #     response = llm.invoke(messages)
 #
-#     # response -- AIMessage
-#     # добавляємо до історії повідомлень
+#     # вивести на екран відповідь
+#     print(f"AI: {response.content[0]['text']}")
+#
+#     # добавити response в історію спілкування
 #     messages.append(response)
 #
-#     # вивести відповідь
-#     print(f"AI: {response.content}")
 #
-#     # вивести саму історії спілкування
-#     print()
-#     print("####ІСТОРІЯ####")
-#
-#     for message in messages:
-#         print(repr(message))
-#
-#     print()
+#     # # вивести історію спілкування
+#     # print()
+#     # print("----------------------------------")
+#     # print("HISTORY")
+#     # for message in messages:
+#     #     print(message)
+#     # print("----------------------------------")
+#     # print()
 
 
-# очищення історії
+
+# очищення історії від зайвих повідомлень
 
 # # створення трімера повідомлень
 # trimmer = trim_messages(
@@ -105,51 +111,45 @@ llm = ChatGoogleGenerativeAI(
 #     include_system=True  # SystemMessage не чіпати
 # )
 #
-# messages = [
-#     SystemMessage(
-#         """
-#         Ти -- ввічливий чат бот, який імітує Толкіна. Давай короткі відповіді
-#         на питання користувача
-#         """
-#     )
-# ]
-#
+# # цикл для спілкування
 # while True:
-#     user_query = input("Ви: ")
+#     # отримати повідомлення від користувача
+#     user_text = input("Ви: ")
 #
-#     # закіцнчуємо якщо натиснути Enter
-#     if user_query == '':
+#     # перевірка для кінця спілкування
+#     if user_text == "":
 #         break
 #
-#     # переволимо повідомлення в HumanMessage
-#     human_message = HumanMessage(user_query)
+#     # створити HumanMessage
+#     human_message = HumanMessage(content=user_text)
 #
-#     # добавляємо до історії повідомлень
+#     # додати повідемлення в історії
 #     messages.append(human_message)
 #
-#     # застововуємо трімер
+#     # очищення історії
 #     messages = trimmer.invoke(messages)
 #
-#     # запускаємо модель
+#     # отримати відповідь моделі
 #     response = llm.invoke(messages)
 #
-#     # response -- AIMessage
-#     # добавляємо до історії повідомлень
+#     # вивести на екран відповідь
+#     print(f"AI: {response.content[0]['text']}")
+#
+#     # добавити response в історію спілкування
 #     messages.append(response)
 #
-#     # вивести відповідь
-#     print(f"AI: {response.content}")
 #
-#     # вивести саму історії спілкування
+#     # вивести історію спілкування
 #     print()
-#     print("####ІСТОРІЯ####")
-#
+#     print("----------------------------------")
+#     print("HISTORY")
 #     for message in messages:
-#         print(repr(message))
-#
+#         print(message)
+#     print("----------------------------------")
 #     print()
 
-# можна зробити ланцюг
+
+# трімер можна об'єднати з моддю в ланцюг
 
 # створення трімера повідомлень
 trimmer = trim_messages(
@@ -163,46 +163,39 @@ trimmer = trim_messages(
     include_system=True  # SystemMessage не чіпати
 )
 
-# створити ланцюг
-chat_chain = trimmer | llm
+# ланцюг
+chain = trimmer | llm
 
-messages = [
-    SystemMessage(
-        """
-        Ти -- ввічливий чат бот, який імітує Толкіна. Давай короткі відповіді
-        на питання користувача
-        """
-    )
-]
-
+# цикл для спілкування
 while True:
-    user_query = input("Ви: ")
+    # отримати повідомлення від користувача
+    user_text = input("Ви: ")
 
-    # закіцнчуємо якщо натиснути Enter
-    if user_query == '':
+    # перевірка для кінця спілкування
+    if user_text == "":
         break
 
-    # переволимо повідомлення в HumanMessage
-    human_message = HumanMessage(user_query)
+    # створити HumanMessage
+    human_message = HumanMessage(content=user_text)
 
-    # добавляємо до історії повідомлень
+    # додати повідемлення в історії
     messages.append(human_message)
 
-    # запускаємо ланцюг
-    response = chat_chain.invoke(messages)
+    # отримати відповідь моделі
+    response = chain.invoke(messages)
 
-    # response -- AIMessage
-    # добавляємо до історії повідомлень
+    # вивести на екран відповідь
+    print(f"AI: {response.content[0]['text']}")
+
+    # добавити response в історію спілкування
     messages.append(response)
 
-    # вивести відповідь
-    print(f"AI: {response.content}")
 
-    # вивести саму історії спілкування
+    # вивести історію спілкування
     print()
-    print("####ІСТОРІЯ####")
-
+    print("----------------------------------")
+    print("HISTORY")
     for message in messages:
-        print(repr(message))
-
+        print(message)
+    print("----------------------------------")
     print()
