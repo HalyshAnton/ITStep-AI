@@ -1,132 +1,147 @@
 # створення агентів
 # агент -- чат-бот(llm) + інструменти
 
-import os
 import dotenv
+import os
 
 from langchain_google_genai import ChatGoogleGenerativeAI
-from langchain_community.utilities import GoogleSerperAPIWrapper
 from langchain.agents import create_agent
+from langchain_core.tools import tool
+from langchain_community.utilities import GoogleSerperAPIWrapper
 from langchain_core.messages import (
     HumanMessage,
     AIMessage,
     SystemMessage,
-    trim_messages, BaseMessage
+    BaseMessage,
+    trim_messages,
 )
 
-
-# завантаження апі ключа
+# завантадити дані з .env
 dotenv.load_dotenv()
-gemini_api_key = os.getenv("GEMINI_API_KEY")
-serper_api_key = os.getenv("SERPER_API_KEY")
 
-# створити llm
+api_key = os.getenv("GEMINI_API_KEY")
+serper_key = os.getenv("SERPER_API_KEY")
+
+# # модель
 llm = ChatGoogleGenerativeAI(
-    model='gemini-2.5-flash',
-    api_key=gemini_api_key,
+    model="gemini-3.5-flash-lite",   # назва моделі
+    api_key=api_key    # ключ до сервера з моделлю
 )
 
-# інструмент -- функція
-# обов'язкова документація
+serper_search = GoogleSerperAPIWrapper(
+    serper_api_key=serper_key
+)
 
-def product(a: int, b: int) -> int:
-    """
-    Множить 2 цілих числа то повертає їхній добуток
 
-    :param a: перше число
-    :param b: друге число
-    :return: добуток чисел
+# інструменти
+
+@tool
+def product(a: float, b: float) -> float:
     """
-    print("hello from product")
+    Множить два дійсних числа між собою
+
+    :param a: float -- перше число
+    :param b: float -- друге число
+    :return: float -- добуток чисел
+    """
+
+    print("hi from product tool")
     return a * b
 
 
-def get_weather(city: str, time: str) -> str:
+@tool
+def get_weather(city: str, hour: int) -> str:
     """
-    Повертає інформацію про погоду у місті в певний час доби
+    Повіретає інформацію про погоду в місті
 
-    :param city: назва міста
-    :param time: час доби(наприклад ранок, вечір, 10:30, 4 години дня)
-    :return: інформація про погоду
+    :param city: str -- назва міста
+    :param hour: int -- година дня окотрій шукати інвормацію про погоду(0-24)
+    :return: прогноз погоди
     """
-    print("hello from get_weather")
-    return f"У {city} о {time} буде сонячно"
+    print("hi from get_weather tool")
+    return f"Погода в {city} о {hour}-ій годині буде сонячна але з хмарами"
 
 
-# інструмент для пошуку в інтернеті
-searcher = GoogleSerperAPIWrapper(serper_api_key=serper_api_key)
-
-def search(query: str) -> str:
+@tool
+def google_search(query: str):
     """
-    Шукає інформацію в інтернеті за запитом користувача
+    Зукає інформацію в інтернеті
 
-    :param query: запит користувача
-    :return: результати пошуку
+    :param query: str -- запит в пошуковик
+    :return: результат пошуку
     """
 
-    results = searcher.results(query)
-    print(results)  # результати пошуку
+    print("hi from google_search tool")
+    result = serper_search.results(query)
+    print(result)
 
-    return str(results)
+    return result
 
 
 # створення агента
 agent = create_agent(
-    model=llm,   # мовна модель
-    tools=[product, get_weather, search]
+    model=llm,   # нейромережа агента
+    tools=[product, get_weather, google_search],   # список інструментів
 )
 
-# історія повідомлень + інструкції
+
+# написати системний промпт
+# разом з ним створюємо історією повідослень
 
 messages = [
-    SystemMessage(
-        """
-        Ти ввічлий чат-бот. Твоя задача давати інформативні та чіткі відповіді
-        на запити користувача.
-        
-        У тебе є доступ до таких інструментів:
-        * product
-        * get_weather
-        * search -- завжди давай посилання на новини
-        """
-    )
+    SystemMessage("""
+    Ти -- ввічлиіий чат бот
+    
+    у тебе є доступ до інструментів
+    * product
+    * get_weather
+    
+    ###ІНСТРУКЦІЯ###
+    1. якщо користувач не вказує назву міста або годину при запиті про погоду, то ти повенен уточнити пропущену інформаці
+    """)
 ]
 
+# цикл зі спідкуванням
 while True:
+    # Запит від користувача
     user_query = input("Ви: ")
 
-    if user_query == '':
+    # умова закінчення
+    if user_query == "":
         break
 
-    # переводимо str рядок у  HumanMessage
-    human_message = HumanMessage(user_query)
+    # зробити human message
+    user_message = HumanMessage(user_query)
 
-    # добавляємо повідослення користувача до історії
-    messages.append(human_message)
+    # добавляємо повідомлення в історію
+    messages.append(user_message)
 
-    # застосування агента
-    # треба передавати словник
-    input_data = {
+    # отримати відповіть від агента
+    # агент сам дадає повідемлення в історію і повертає її
+
+    # агент треба передавати словник зі ключем "messages"
+    data = {
         "messages": messages
     }
 
-    response = agent.invoke(input_data)
-    # response -- словник з усією історією + відповідь моделі
+    data = agent.invoke(data)
+    # агент так само повертає словник
 
-    # отримання всіє історії повідомлень
-    messages = response['messages']
+    # дістаємо нову історію повідомлень
+    messages = data["messages"]
 
-    # отримати фінальну відповідь моделі
-    answear = messages[-1]
-    print(answear.content)
+    # відповідь моделі -- останнє повідомлення в історії
+    response = messages[-1]
 
-    # виведемння всієї історії
+    # вивести відповідь на екран
+    print(response.text)
+
+    # виведення історії
     print()
-    print("Історія")
+    print("----------ІСТОРІЯ-----------")
 
     for message in messages:
-        print(repr(message))
+        print(repr(message))  # вивести разом з назсою класу
 
-
-
-
+    print("-----------------------------")
+    print()
