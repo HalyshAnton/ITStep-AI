@@ -4,6 +4,7 @@
 
 import dotenv
 import os
+import json
 
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_google_genai import GoogleGenerativeAIEmbeddings
@@ -131,10 +132,21 @@ def google_search(query: str):
     return result
 
 
+@tool
+def save_json(data: dict):
+    """
+    берігає дані в json файл
+    :param data: dict -- дані
+    :return:
+    """
+
+    with open("file.json", "w", encoding="utf-8") as f:
+        json.dump(data, f)
+
 # створення агента
 agent = create_agent(
     model=llm,  # нейромережа агента
-    tools=[product, get_weather, google_search, document_search],  # список інструментів
+    tools=[product, get_weather, google_search, document_search, save_json],  # список інструментів
 )
 
 # написати системний промпт
