@@ -93,10 +93,10 @@ documents = [doc1, doc2, doc3]
 uuids = [str(uuid4()) for _ in range(len(documents))]
 
 # # добавити документи в базу даних
-# vector_store.add_documents(
-#     documents=documents,
-#     ids=uuids
-# )
+vector_store.add_documents(
+    documents=documents,
+    ids=uuids
+)
 
 
 # знаходження сходих документів
