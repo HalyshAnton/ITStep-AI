@@ -44,8 +44,6 @@ import streamlit as st
 
 
 # ЧАТ-БОТ
-import dotenv
-import os
 
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.messages import (
