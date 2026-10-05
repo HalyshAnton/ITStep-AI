@@ -13,7 +13,8 @@ import utils
 # ==================================================
 
 # 1. ВКАЗУЄМО абсолютний шлях до папки з розміткою train/labels
-# Перевірте, щоб шлях відповідав вашому розпакованому архіву
+# Перевірте, щоб шлях відповідав вашому розпакованому
+
 LABELS_PATH = r"D:\IT_STEP_Academy\EXAM\train\labels"
 
 print("=" * 60)
@@ -56,6 +57,6 @@ print("РОЗПОДІЛ ОБ'ЄКТІВ ЗА КЛАСАМИ:")
 
 for class_id, count in sorted(class_counter.items()):
     percentage = (count / total_objects) * 100 if total_objects > 0 else 0
-    print(f"Клас{class_id}: {count}шт. ({percentage:.2f}%)")
+    print(f"Клас{class_id}: {count} шт. ({percentage:.2f} %)")
 
 print("=" * 60)
